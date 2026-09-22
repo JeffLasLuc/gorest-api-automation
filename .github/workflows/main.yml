@@ -15,18 +15,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Instalar Inso CLI (Oficial)
+        uses: kong/setup-inso@v1
         with:
-          node-version: '18'
+          inso-version: latest
 
-      - name: Instalar dependências do SO (Fix libcurl)
-        run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
-
-      - name: Install Insomnia CLI
-        run: npm install -g insomnia-inso
+      - name: Injetar Token de Seguranca
+        run: sed -i 's/SEU_TOKEN_AQUI/${{ secrets.GOREST_TOKEN }}/g' Testes_GoRest.json
 
       - name: Run tests
-        env:
-          GOREST_TOKEN: ${{ secrets.GOREST_TOKEN }}
         run: inso run test Testes_GoRest.json --env "QA - GoRest" --ci
