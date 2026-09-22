@@ -20,8 +20,14 @@ jobs:
         with:
           inso-version: 8.6.0
 
-      - name: Injetar Token de Seguranca
-        run: sed -i 's/SEU_TOKEN_AQUI/${{ secrets.GOREST_TOKEN }}/g' APITest_GoRest.json
+      - name: Import collection
+        run: inso import APITest_GoRest.json
+
+      - name: List test suites
+        run: inso list test suites
 
       - name: Run tests
-        run: inso run test APITest_GoRest.json --env "QA - GoRest" --ci
+        env:
+          base_url: https://gorest.co.in/public/v2
+          token: ${{ secrets.GOREST_TOKEN }}
+        run: inso run test "Testes GoRest" --ci
