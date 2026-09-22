@@ -20,11 +20,11 @@ jobs:
         with:
           inso-version: 8.6.0
 
-      - name: Import collection
-        run: inso import APITest_GoRest.json
-
       - name: List test suites
-        run: inso list test suites
+        run: inso list test suites --workingDir APITest_GoRest.json
 
       - name: Run tests
-        run: inso run test APITest_GoRest.json --env "QA - GoRest" --ci
+        env:
+          base_url: https://gorest.co.in/public/v2
+          token: ${{ secrets.GOREST_TOKEN }}
+        run: inso run test "Testes GoRest" --workingDir APITest_GoRest.json --ci
