@@ -1,0 +1,511 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Testes GoRest
+meta:
+  id: wrk_2aea542a7313489e99c5adfa50f6666d
+  created: 1790094413482
+  modified: 1790094413482
+  description: ""
+collection:
+  - name: 1. User Management
+    meta:
+      id: fld_2a32cff23b864df09eb42b1737e31a52
+      created: 1790094448658
+      modified: 1790109889574
+      sortKey: -1790094448658
+      description: ""
+    children:
+      - url: "{{ _.base_url }}/users"
+        name: 1_CreateUser
+        meta:
+          id: req_5a24c9bb25e844e0b210abbb94309e2d
+          created: 1790094456826
+          modified: 1790106440896
+          isPrivate: false
+          description: ""
+          sortKey: -1790094456826
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "{% faker 'randomFirstName' %}",
+              "gender": "male",
+              "email": "{% faker 'randomEmail' %}",
+              "status": "active"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+        scripts:
+          afterResponse: >-
+            // Valida se a API retornou sucesso na criação
+
+            insomnia.test("Status code deve ser 201 Created", function () {
+                insomnia.response.to.have.status(201);
+            });
+
+
+            // Transforma a resposta em JSON
+
+            const resposta = insomnia.response.json();
+
+
+            // Captura o ID e salva na variável 'user_id'
+
+            insomnia.environment.set("user_id", resposta.id);
+
+
+            // Garante que o ID realmente veio no formato correto (número)
+
+            insomnia.test("Validar se o ID foi gerado corretamente", function ()
+            {
+                insomnia.expect(resposta.id).to.be.a('number');
+            });
+
+
+            // Exibe o ID gerado
+
+            insomnia.test(`Log: O ID gerado para o teste foi ${resposta.id}`,
+            function () {
+                insomnia.expect(resposta.id).to.be.a('number');
+            });
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/users/{{ _.user_id }}"
+        name: 2_SearchUser
+        meta:
+          id: req_676373c56cd3419faff3db2aebb54093
+          created: 1790106258957
+          modified: 1790106792161
+          isPrivate: false
+          description: ""
+          sortKey: -1790106258957
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+        scripts:
+          afterResponse: >-
+            // Validação de Status
+
+            insomnia.test("Status code deve ser 200 OK", function () {
+                insomnia.response.to.have.status(200);
+            });
+
+
+            // Parse da resposta e captura da variável
+
+            const resposta = insomnia.response.json();
+
+            const idBuscado = insomnia.environment.get("user_id");
+
+
+            // Validação de Integridade (Garante que a API não trouxe o usuário
+            errado)
+
+            insomnia.test(`O usuário retornado deve ter o ID ${idBuscado}`,
+            function () {
+                insomnia.expect(resposta.id).to.equal(idBuscado);
+            });
+
+
+            // Validação de Contrato (Garante que os campos obrigatórios
+            existem)
+
+            insomnia.test("A resposta deve conter a estrutura correta (id, name,
+            email, gender, status)", function () {
+                insomnia.expect(resposta).to.have.property('id');
+                insomnia.expect(resposta).to.have.property('name');
+                insomnia.expect(resposta).to.have.property('email');
+                insomnia.expect(resposta).to.have.property('gender');
+                insomnia.expect(resposta).to.have.property('status');
+            });
+
+
+            // Teste Não-Funcional básico (Performance)
+
+            insomnia.test("O tempo de resposta deve ser menor que 1000ms",
+            function () {
+                insomnia.expect(insomnia.response.responseTime).to.be.below(1000);
+            });
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/users/{{ _.user_id }}"
+        name: 5_DeleteUser
+        meta:
+          id: req_41d0f07786bd4682a13a571c25759ac8
+          created: 1790106455102
+          modified: 1790109801673
+          isPrivate: false
+          description: ""
+          sortKey: -1790106455102
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+        scripts:
+          afterResponse: |-
+            insomnia.test("Status code deve ser 200 OK", function () {
+                insomnia.response.to.have.status(200);
+            });
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/users/{{ _.user_id }}"
+        name: 3_UpdateStatusUserInactive
+        meta:
+          id: req_33216c603a2544a3acec6ee0e2d2ae91
+          created: 1790107920225
+          modified: 1790109796145
+          isPrivate: false
+          description: ""
+          sortKey: -1790107920225
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "user_name",
+              "status": "inactive"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+        scripts:
+          afterResponse: >-
+            // Validação de Status
+
+            insomnia.test("Status code deve ser 200 OK", function () {
+                insomnia.response.to.have.status(200);
+            });
+
+
+            // Parse da resposta e captura da variável
+
+            const resposta = insomnia.response.json();
+
+            const idBuscado = insomnia.environment.get("user_id");
+
+            const nomeOriginal = insomnia.environment.get("user_name");
+
+
+            // Busca o nome já existente para não alterar com o PUT
+
+            insomnia.environment.set("user_name", resposta.name);
+
+
+            // Garante que o campo alvo foi alterado
+
+            insomnia.test("O status deve ter sido alterado para inactive",
+            function () {
+                insomnia.expect(resposta.status).to.equal("inactive");
+            });
+
+
+            // Garante que os dados preexistentes não foram corrompidos
+
+            insomnia.test("O nome deve ter permanecido o mesmo", function () {
+                const nomeOriginal = insomnia.environment.get("user_name");
+                insomnia.expect(resposta.name).to.equal(nomeOriginal);
+            });
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/users/{{ _.user_id }}"
+        name: 4_UpdateStatusUserActive
+        meta:
+          id: req_576ee94830124baeb868703f9d42064c
+          created: 1790109780291
+          modified: 1790109852990
+          isPrivate: false
+          description: ""
+          sortKey: -1790107772346.5
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "user_name",
+              "status": "active"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+        scripts:
+          afterResponse: >-
+            // Validação de Status
+
+            insomnia.test("Status code deve ser 200 OK", function () {
+                insomnia.response.to.have.status(200);
+            });
+
+
+            // Parse da resposta e captura da variável
+
+            const resposta = insomnia.response.json();
+
+            const idBuscado = insomnia.environment.get("user_id");
+
+            const nomeOriginal = insomnia.environment.get("user_name");
+
+
+            // Busca o nome já existente para não alterar com o PUT
+
+            insomnia.environment.set("user_name", resposta.name);
+
+
+            // Garante que o campo alvo foi alterado
+
+            insomnia.test("O status deve ter sido alterado para active",
+            function () {
+                insomnia.expect(resposta.status).to.equal("active");
+            });
+
+
+            // Garante que os dados preexistentes não foram corrompidos
+
+            insomnia.test("O nome deve ter permanecido o mesmo", function () {
+                const nomeOriginal = insomnia.environment.get("user_name");
+                insomnia.expect(resposta.name).to.equal(nomeOriginal);
+            });
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 2. Negative Tests
+    meta:
+      id: fld_b82d63f1516f4440a1d7a7635e609bc6
+      created: 1790107120121
+      modified: 1790107741699
+      sortKey: -1790107120121
+      description: ""
+    children:
+      - url: "{{ _.base_url }}/users"
+        name: 1_CreateUserWithoutToken
+        meta:
+          id: req_666ab2ba1e9f4fd8a52f1480ec474260
+          created: 1790107133648
+          modified: 1790107293102
+          isPrivate: false
+          description: ""
+          sortKey: -1790107133648
+        method: POST
+        authentication:
+          type: none
+        scripts:
+          afterResponse: >-
+            // Valida se a API barrou o acesso corretamente
+
+            insomnia.test("Status code deve ser 401 Unauthorized", function () {
+                insomnia.response.to.have.status(401);
+            });
+
+
+            // Valida se a mensagem de erro faz sentido
+
+            const resposta = insomnia.response.json();
+
+            insomnia.test("A mensagem de erro deve indicar falha de
+            autenticação", function () {
+                insomnia.expect(resposta.message).to.equal("Authentication failed");
+            });
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/users"
+        name: 2_CreateUserWithoutEmail
+        meta:
+          id: req_3b2370516b4c4852a701ae8213f8628d
+          created: 1790107305193
+          modified: 1790107429877
+          isPrivate: false
+          description: ""
+          sortKey: -1790107305193
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "{% faker 'randomFirstName' %}",
+              "gender": "male",
+              "status": "active"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+        scripts:
+          afterResponse: >-
+            // Valida se a API recusou o processamento incompleto
+
+            insomnia.test("Status code deve ser 422 Unprocessable Entity",
+            function () {
+                insomnia.response.to.have.status(422);
+            });
+
+
+            // O GoRest retorna uma lista de erros. Valida se o erro foi a
+            ausência de e-mail
+
+            const resposta = insomnia.response.json();
+
+            insomnia.test("A API deve informar que o campo email está em
+            branco", function () {
+                // O GoRest devolve um array. Vamos pegar o primeiro item [0]
+                insomnia.expect(resposta[0].field).to.equal("email");
+                insomnia.expect(resposta[0].message).to.equal("can't be blank");
+            });
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/users/99999999999999"
+        name: 3_SearchInexistentUser
+        meta:
+          id: req_84daecc1dd824ef8b3af39cb0adb3d4f
+          created: 1790107504709
+          modified: 1790107580553
+          isPrivate: false
+          description: ""
+          sortKey: -1790107504709
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+        scripts:
+          afterResponse: >-
+            // Valida se a API tratou corretamente a ausência do dado
+
+            insomnia.test("Status code deve ser 404 Not Found", function () {
+                insomnia.response.to.have.status(404);
+            });
+
+
+            // Valida a mensagem de erro retornada
+
+            const resposta = insomnia.response.json();
+
+            insomnia.test("A API deve retornar mensagem informando que o recurso
+            não foi encontrado", function () {
+                insomnia.expect(resposta.message).to.equal("Resource not found");
+            });
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/users"
+        name: 4_UserStatusInvalid
+        meta:
+          id: req_c6d9296fcec84639aef6b8d34fb86616
+          created: 1790107624468
+          modified: 1790107738695
+          isPrivate: false
+          description: ""
+          sortKey: -1790107624468
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "name": "{% faker 'randomFirstName' %}",
+              "gender": "male",
+              "email": "{% faker 'randomEmail' %}",
+              "status": "inválido" 
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+        scripts:
+          afterResponse: >-
+            insomnia.test("Status code deve ser 422 Unprocessable Entity",
+            function () {
+                insomnia.response.to.have.status(422);
+            });
+
+
+            // A API deve apontar exatamente o campo com falha na validação
+
+            const resposta = insomnia.response.json();
+
+            insomnia.test("A API deve apontar erro no campo status", function ()
+            {
+                insomnia.expect(resposta[0].field).to.equal("status");
+            });
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_054ca3a9139440b923820696625ea44e96ac1536
+    created: 1790094413487
+    modified: 1790109889562
+environments:
+  name: Base Environment
+  meta:
+    id: env_054ca3a9139440b923820696625ea44e96ac1536
+    created: 1790094413485
+    modified: 1790109889564
+    isPrivate: false
+  data:
+    user_id: 8634888
+    user_name: user_name
