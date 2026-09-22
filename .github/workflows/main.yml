@@ -27,7 +27,4 @@ jobs:
         run: inso list test suites
 
       - name: Run tests
-        env:
-          base_url: https://gorest.co.in/public/v2
-          token: ${{ secrets.GOREST_TOKEN }}
-        run: inso run test "Testes GoRest" --ci
+        run: inso run test APITest_GoRest.json --env "QA - GoRest" --ci
