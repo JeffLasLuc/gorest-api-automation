@@ -18,7 +18,7 @@ jobs:
       - name: Instalar Inso CLI (Oficial)
         uses: kong/setup-inso@v1
         with:
-          inso-version: latest
+          inso-version: 8.6.0
 
       - name: Injetar Token de Seguranca
         run: sed -i 's/SEU_TOKEN_AQUI/${{ secrets.GOREST_TOKEN }}/g' Testes_GoRest.json
