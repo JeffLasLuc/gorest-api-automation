@@ -24,4 +24,6 @@ jobs:
         run: npm install -g insomnia-inso
 
       - name: Run tests
+        env:
+          GOREST_TOKEN: ${{ secrets.GOREST_TOKEN }}
         run: inso run test Testes_GoRest.json --env "QA - GoRest" --ci
