@@ -38,4 +38,4 @@ Este repositório contém uma suíte automatizada de testes para a API pública 
 *Dado* que eu envio um payload incompleto, sem o campo "email"
 *Quando* eu tento criar um novo usuário
 *Então* o sistema recusa a requisição retornando o status 422 Unprocessable Entity
-*E* a mensagem de erro aponta exatamente qual campo causou a falha
+*E* a mensagem de erro aponta exatamente qual campo causou a falha 
