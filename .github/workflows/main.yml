@@ -24,4 +24,4 @@ jobs:
         env:
           base_url: https://gorest.co.in/public/v2
           token: ${{ secrets.GOREST_TOKEN }}
-        run: inso run test --workingDir APITest_GoRest.json --ci
+        run: inso run test --src APITest_GoRest.json --ci
