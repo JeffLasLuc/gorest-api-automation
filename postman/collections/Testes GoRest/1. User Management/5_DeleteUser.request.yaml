@@ -8,8 +8,8 @@ auth:
 scripts:
   - type: afterResponse
     code: |-
-      pm.test("Status code deve ser 200 OK", function () {
-          pm.response.to.have.status(200);
+      pm.test("Status code deve ser 204 No Content", function () {
+          pm.response.to.have.status(204);
       });
     language: text/javascript
 order: 5000
