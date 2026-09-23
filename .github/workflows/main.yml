@@ -38,7 +38,11 @@ jobs:
       - name: Inject token into Environment.json
         run: |
           echo "Injetando token no Environment.json..."
-          sed -i 's/token_falso_aqui/${{ secrets.GOREST_TOKEN }}/g' Environment.json
+          if [ -z "${{ secrets.GOREST_TOKEN }}" ]; then
+            echo "ERRO: GOREST_TOKEN secret não está configurado"
+            exit 1
+          fi
+          sed -i "s/token_falso_aqui/${{ secrets.GOREST_TOKEN }}/g" Environment.json
           echo "Conteúdo do Environment.json após injeção:"
           cat Environment.json
 
