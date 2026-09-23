@@ -15,13 +15,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Instalar Inso CLI (Oficial)
-        uses: kong/setup-inso@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          inso-version: 8.6.0
+          node-version: '18'
 
-      - name: Run tests
+      - name: Convert Insomnia to Postman
+        run: npx insomnia-to-postman APITest_GoRest.json APITest_GoRest.postman_collection.json
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run tests with Newman
         env:
           base_url: https://gorest.co.in/public/v2
           token: ${{ secrets.GOREST_TOKEN }}
-        run: inso run test --src APITest_GoRest.json --ci
+        run: newman run APITest_GoRest.postman_collection.json --global-var "base_url=${{ env.base_url }}" --global-var "token=${{ env.token }}"
