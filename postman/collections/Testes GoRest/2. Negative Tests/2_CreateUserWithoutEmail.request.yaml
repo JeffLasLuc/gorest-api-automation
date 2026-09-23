@@ -1,0 +1,30 @@
+$kind: http-request
+url: "{{base_url}}/users"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "{{$randomFullName}}",
+      "gender": "male",
+      "status": "active"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code deve ser 422 Unprocessable Entity", function () {
+          pm.response.to.have.status(422);
+      });
+      const resposta = pm.response.json();
+      pm.test("A API deve informar que o campo email está em branco", function () {
+          pm.expect(resposta[0].field).to.equal("email");
+          pm.expect(resposta[0].message).to.equal("can't be blank");
+      });
+    language: text/javascript
+order: 2000

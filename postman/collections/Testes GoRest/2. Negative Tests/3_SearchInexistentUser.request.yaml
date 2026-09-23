@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{base_url}}/users/99999999999999"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code deve ser 404 Not Found", function () {
+          pm.response.to.have.status(404);
+      });
+      const resposta = pm.response.json();
+      pm.test("A API deve retornar mensagem informando que o recurso não foi encontrado", function () {
+          pm.expect(resposta.message).to.equal("Resource not found");
+      });
+    language: text/javascript
+order: 3000

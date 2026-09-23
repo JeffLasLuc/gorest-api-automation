@@ -1,0 +1,10 @@
+name: GoRest
+values:
+  - key: base_url
+    value: 'https://gorest.co.in/public/v2'
+  - key: token
+    value: b9d2f80aa323c1f0e1de8fa1f203d21d891d129b0d1224fecfa7ba536437de12
+  - key: user_id
+    value: ''
+  - key: user_name
+    value: ''

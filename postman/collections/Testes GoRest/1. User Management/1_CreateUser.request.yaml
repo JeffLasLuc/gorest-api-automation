@@ -1,0 +1,32 @@
+$kind: http-request
+url: "{{base_url}}/users"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "{{$randomFullName}}",
+      "gender": "male",
+      "email": "{{$randomEmail}}",
+      "status": "active"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code deve ser 201 Created", function () {
+          pm.response.to.have.status(201);
+      });
+      const resposta = pm.response.json();
+      pm.environment.set("user_id", resposta.id);
+      pm.environment.set("user_name", resposta.name);
+      pm.test("Validar se o ID foi gerado corretamente", function () {
+          pm.expect(resposta.id).to.be.a('number');
+      });
+    language: text/javascript
+order: 1000

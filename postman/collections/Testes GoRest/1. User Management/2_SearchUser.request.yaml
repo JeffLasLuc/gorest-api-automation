@@ -1,0 +1,30 @@
+$kind: http-request
+url: "{{base_url}}/users/{{user_id}}"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code deve ser 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+      const resposta = pm.response.json();
+      const idBuscado = pm.environment.get("user_id");
+      pm.test(`O usuário retornado deve ter o ID ${idBuscado}`, function () {
+          pm.expect(resposta.id).to.equal(idBuscado);
+      });
+      pm.test("A resposta deve conter a estrutura correta (id, name, email, gender, status)", function () {
+          pm.expect(resposta).to.have.property('id');
+          pm.expect(resposta).to.have.property('name');
+          pm.expect(resposta).to.have.property('email');
+          pm.expect(resposta).to.have.property('gender');
+          pm.expect(resposta).to.have.property('status');
+      });
+      pm.test("O tempo de resposta deve ser menor que 1000ms", function () {
+          pm.expect(pm.response.responseTime).to.be.below(1000);
+      });
+    language: text/javascript
+order: 2000

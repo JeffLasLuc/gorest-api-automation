@@ -1,0 +1,33 @@
+$kind: http-request
+url: "{{base_url}}/users/{{user_id}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "{{user_name}}",
+      "status": "active"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code deve ser 200 OK", function () {
+          pm.response.to.have.status(200);
+      });
+      const resposta = pm.response.json();
+      pm.environment.set("user_name", resposta.name);
+      pm.test("O status deve ter sido alterado para active", function () {
+          pm.expect(resposta.status).to.equal("active");
+      });
+      pm.test("O nome deve ter permanecido o mesmo", function () {
+          const nomeOriginal = pm.environment.get("user_name");
+          pm.expect(resposta.name).to.equal(nomeOriginal);
+      });
+    language: text/javascript
+order: 4000

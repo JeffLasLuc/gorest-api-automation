@@ -1,0 +1,9 @@
+workspace:
+  id: 4ed78121-5133-4b08-89a6-54f660e5138b
+cloudResources:
+  collections:
+    ../postman/collections/Testes GoRest: 58451284-7b5fbf17-5a17-4db7-99d0-85a537892cb2
+  environments:
+    ../postman/environments/GoRest.environment.yaml: 58451284-eaa24a63-6fde-4923-9d7a-40c97d73f290
+  globals:
+    ../postman/globals/workspace.globals.yaml: 08bbbe34-8413-40f7-8813-97c1afd30feb

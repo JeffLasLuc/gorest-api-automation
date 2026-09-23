@@ -1,0 +1,445 @@
+{
+  "info": {
+    "_postman_id": "7b5fbf17-5a17-4db7-99d0-85a537892cb2",
+    "name": "Testes GoRest",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58451284",
+    "_collection_link": "https://go.postman.co/collection/58451284-7b5fbf17-5a17-4db7-99d0-85a537892cb2?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "1. User Management",
+      "item": [
+        {
+          "name": "1_CreateUser",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code deve ser 201 Created\", function () {\n    pm.response.to.have.status(201);\n});\nconst resposta = pm.response.json();\npm.environment.set(\"user_id\", resposta.id);\npm.environment.set(\"user_name\", resposta.name);\npm.test(\"Validar se o ID foi gerado corretamente\", function () {\n    pm.expect(resposta.id).to.be.a('number');\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{$randomFullName}}\",\n  \"gender\": \"male\",\n  \"email\": \"{{$randomEmail}}\",\n  \"status\": \"active\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2_SearchUser",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code deve ser 200 OK\", function () {\n    pm.response.to.have.status(200);\n});\nconst resposta = pm.response.json();\nconst idBuscado = pm.environment.get(\"user_id\");\npm.test(`O usuário retornado deve ter o ID ${idBuscado}`, function () {\n    pm.expect(resposta.id).to.equal(idBuscado);\n});\npm.test(\"A resposta deve conter a estrutura correta (id, name, email, gender, status)\", function () {\n    pm.expect(resposta).to.have.property('id');\n    pm.expect(resposta).to.have.property('name');\n    pm.expect(resposta).to.have.property('email');\n    pm.expect(resposta).to.have.property('gender');\n    pm.expect(resposta).to.have.property('status');\n});\npm.test(\"O tempo de resposta deve ser menor que 1000ms\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(1000);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3_UpdateStatusUserInactive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code deve ser 200 OK\", function () {\n    pm.response.to.have.status(200);\n});\nconst resposta = pm.response.json();\npm.environment.set(\"user_name\", resposta.name);\npm.test(\"O status deve ter sido alterado para inactive\", function () {\n    pm.expect(resposta.status).to.equal(\"inactive\");\n});\npm.test(\"O nome deve ter permanecido o mesmo\", function () {\n    const nomeOriginal = pm.environment.get(\"user_name\");\n    pm.expect(resposta.name).to.equal(nomeOriginal);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{user_name}}\",\n  \"status\": \"inactive\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4_UpdateStatusUserActive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code deve ser 200 OK\", function () {\n    pm.response.to.have.status(200);\n});\nconst resposta = pm.response.json();\npm.environment.set(\"user_name\", resposta.name);\npm.test(\"O status deve ter sido alterado para active\", function () {\n    pm.expect(resposta.status).to.equal(\"active\");\n});\npm.test(\"O nome deve ter permanecido o mesmo\", function () {\n    const nomeOriginal = pm.environment.get(\"user_name\");\n    pm.expect(resposta.name).to.equal(nomeOriginal);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{user_name}}\",\n  \"status\": \"active\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5_DeleteUser",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code deve ser 200 OK\", function () {\n    pm.response.to.have.status(200);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Negative Tests",
+      "item": [
+        {
+          "name": "1_CreateUserWithoutToken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code deve ser 401 Unauthorized\", function () {\n    pm.response.to.have.status(401);\n});\nconst resposta = pm.response.json();\npm.test(\"A mensagem de erro deve indicar falha de autenticação\", function () {\n    pm.expect(resposta.message).to.equal(\"Authentication failed\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{$randomFullName}}\",\n  \"gender\": \"male\",\n  \"email\": \"{{$randomEmail}}\",\n  \"status\": \"active\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2_CreateUserWithoutEmail",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code deve ser 422 Unprocessable Entity\", function () {\n    pm.response.to.have.status(422);\n});\nconst resposta = pm.response.json();\npm.test(\"A API deve informar que o campo email está em branco\", function () {\n    pm.expect(resposta[0].field).to.equal(\"email\");\n    pm.expect(resposta[0].message).to.equal(\"can't be blank\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{$randomFullName}}\",\n  \"gender\": \"male\",\n  \"status\": \"active\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3_SearchInexistentUser",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code deve ser 404 Not Found\", function () {\n    pm.response.to.have.status(404);\n});\nconst resposta = pm.response.json();\npm.test(\"A API deve retornar mensagem informando que o recurso não foi encontrado\", function () {\n    pm.expect(resposta.message).to.equal(\"Resource not found\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/99999999999999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "99999999999999"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4_UserStatusInvalid",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code deve ser 422 Unprocessable Entity\", function () {\n    pm.response.to.have.status(422);\n});\nconst resposta = pm.response.json();\npm.test(\"A API deve apontar erro no campo status\", function () {\n    pm.expect(resposta[0].field).to.equal(\"status\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{$randomFullName}}\",\n  \"gender\": \"male\",\n  \"email\": \"{{$randomEmail}}\",\n  \"status\": \"inválido\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

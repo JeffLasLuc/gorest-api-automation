@@ -1,0 +1,28 @@
+$kind: http-request
+url: "{{base_url}}/users"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "{{$randomFullName}}",
+      "gender": "male",
+      "email": "{{$randomEmail}}",
+      "status": "active"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status code deve ser 401 Unauthorized", function () {
+          pm.response.to.have.status(401);
+      });
+      const resposta = pm.response.json();
+      pm.test("A mensagem de erro deve indicar falha de autenticação", function () {
+          pm.expect(resposta.message).to.equal("Authentication failed");
+      });
+    language: text/javascript
+order: 1000
