@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - develop
       - master
 
 jobs:
@@ -20,14 +19,28 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Convert Insomnia to Postman
-        run: npx insomnia-to-postman APITest_GoRest.json APITest_GoRest.postman_collection.json
-
       - name: Install Newman
         run: npm install -g newman
 
+      - name: Verify files exist
+        run: |
+          echo "Verificando arquivos necessários..."
+          ls -la
+          if [ ! -f "Testes_GoRest.json" ]; then
+            echo "ERRO: Testes_GoRest.json não encontrado"
+            exit 1
+          fi
+          if [ ! -f "Environment.json" ]; then
+            echo "ERRO: Environment.json não encontrado"
+            exit 1
+          fi
+
+      - name: Inject token into Environment.json
+        run: |
+          echo "Injetando token no Environment.json..."
+          sed -i 's/token_falso_aqui/${{ secrets.GOREST_TOKEN }}/g' Environment.json
+          echo "Conteúdo do Environment.json após injeção:"
+          cat Environment.json
+
       - name: Run tests with Newman
-        env:
-          base_url: https://gorest.co.in/public/v2
-          token: ${{ secrets.GOREST_TOKEN }}
-        run: newman run APITest_GoRest.postman_collection.json --global-var "base_url=${{ env.base_url }}" --global-var "token=${{ env.token }}"
+        run: newman run Testes_GoRest.json -e Environment.json --color on --reporters cli,json
